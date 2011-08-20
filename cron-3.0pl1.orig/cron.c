@@ -25,11 +25,12 @@ static char rcsid[] = "$Id: cron.c,v 2.11 1994/01/15 20:43:43 vixie Exp $";
 
 #include "cron.h"
 #include <sys/signal.h>
-#if SYS_TIME_H
-# include <sys/time.h>
-#else
+// zeamoceq -> include time.h and nothing else...
+//#if SYS_TIME_H
+//# include <sys/time.h>
+//#else
 # include <time.h>
-#endif
+//#endif
 
 
 static	void	usage __P((void)),
