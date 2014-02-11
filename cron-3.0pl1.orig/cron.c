@@ -25,13 +25,14 @@ static char rcsid[] = "$Id: cron.c,v 2.11 1994/01/15 20:43:43 vixie Exp $";
 
 #include "cron.h"
 #include <sys/signal.h>
-// zeamoceq -> include time.h and nothing else...
-//#if SYS_TIME_H
-//# include <sys/time.h>
-//#else
+#if SYS_TIME_H
+# include <sys/time.h>
+#else
 # include <time.h>
-//#endif
+#endif
 
+// zeamoceq - Sailfish 'sleep'
+#include "libiphb/libiphb.h"
 
 static	void	usage __P((void)),
 		run_reboot_jobs __P((cron_db *)),
@@ -76,7 +77,7 @@ main(argc, argv)
 	(void) signal(SIGHUP, sighup_handler);
 
 	acquire_daemonlock(0);
-	set_cron_uid();
+    set_cron_uid();
 	set_cron_cwd();
 
 #if defined(POSIX)
@@ -163,11 +164,11 @@ cron_tick(db)
 
 	/* make 0-based values out of these so we can use them as indicies
 	 */
-	minute = tm->tm_min -FIRST_MINUTE;
-	hour = tm->tm_hour -FIRST_HOUR;
-	dom = tm->tm_mday -FIRST_DOM;
-	month = tm->tm_mon +1 /* 0..11 -> 1..12 */ -FIRST_MONTH;
-	dow = tm->tm_wday -FIRST_DOW;
+    minute = tm->tm_min -FIRST_MINUTE;
+    hour = tm->tm_hour -FIRST_HOUR;
+    dom = tm->tm_mday -FIRST_DOM;
+    month = tm->tm_mon +1 /* 0..11 -> 1..12 */ -FIRST_MONTH;
+    dow = tm->tm_wday -FIRST_DOW;
 
 	Debug(DSCH, ("[%d] tick(%d,%d,%d,%d,%d)\n",
 		getpid(), minute, hour, dom, month, dow))
@@ -213,7 +214,7 @@ cron_sync() {
 
 	TargetTime = time((time_t*)0);
 	tm = localtime(&TargetTime);
-	TargetTime += (60 - tm->tm_sec);
+    TargetTime += (60 - tm->tm_sec);
 }
 
 
@@ -240,7 +241,30 @@ cron_sleep() {
 	while (seconds_to_wait > 0) {
 		Debug(DSCH, ("[%d] sleeping for %d seconds\n",
 			getpid(), seconds_to_wait))
-		seconds_to_wait = (int) sleep((unsigned int) seconds_to_wait);
+        // Sailfish
+        // use libiphb for sleeping
+        // probably needs improvments
+        {
+            iphb_t iphbdHandler;
+            int sockfd;
+            fd_set readfds;
+            struct timeval timeout;
+            time_t r;
+
+            iphbdHandler = iphb_open(0);
+            sockfd = iphb_get_fd(iphbdHandler);
+            r = iphb_wait(iphbdHandler, seconds_to_wait - (seconds_to_wait * .95), seconds_to_wait + (seconds_to_wait * .95), 0);
+
+            FD_ZERO(&readfds);
+            FD_SET(sockfd, &readfds);
+
+            timeout.tv_sec = seconds_to_wait + 2;
+            timeout.tv_usec = 0;
+
+            select(sockfd + 1, &readfds, NULL, NULL, &timeout);
+
+            seconds_to_wait = 0;
+        }
 	}
 }
 

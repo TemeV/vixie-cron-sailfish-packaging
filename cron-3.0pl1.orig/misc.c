@@ -173,17 +173,19 @@ set_debug_flags(flags)
 void
 set_cron_uid()
 {
-#if defined(BSD) || defined(POSIX)
-	if (seteuid(ROOT_UID) < OK) {
-		perror("seteuid");
-		exit(ERROR_EXIT);
-	}
-#else
+// Sailfish
+// use setuid and nothing else
+//#if defined(BSD) || defined(POSIX)
+//	if (seteuid(ROOT_UID) < OK) {
+//		perror("seteuid");
+//		exit(ERROR_EXIT);
+//	}
+//#else
 	if (setuid(ROOT_UID) < OK) {
 		perror("setuid");
 		exit(ERROR_EXIT);
 	}
-#endif
+//#endif
 }
 
 
@@ -495,10 +497,10 @@ log_it(username, xpid, event, detail)
 	 * everything out in one chunk and this has to be atomically appended
 	 * to the log file.
 	 */
-        //sprintf(msg, "%s (%02d/%02d-%02d:%02d:%02d-%d) %s (%s)\n",
-        //	username,
-        //	t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, pid,
-        //	event, detail);
+	sprintf(msg, "%s (%02d/%02d-%02d:%02d:%02d-%d) %s (%s)\n",
+		username,
+		t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, pid,
+		event, detail);
 
 	/* we have to run strlen() because sprintf() returns (char*) on old BSD
 	 */

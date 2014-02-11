@@ -78,7 +78,7 @@ DEFS		=
 #INSTALL = installbsd
 INSTALL = install
 #<<any special load flags>>
-LDFLAGS		=
+LDFLAGS		=	-lrt
 #################################### end configurable stuff
 
 SHELL		=	/bin/sh
@@ -89,13 +89,13 @@ MANPAGES	=	bitstring.3 crontab.5 crontab.1 cron.8 putman.sh
 HEADERS		=	bitstring.h cron.h config.h pathnames.h \
 			externs.h compat.h
 SOURCES		=	cron.c crontab.c database.c do_command.c entry.c \
-			env.c job.c user.c popen.c misc.c compat.c
+			env.c job.c user.c popen.c misc.c compat.c libiphb/libiphb.c
 SHAR_SOURCE	=	$(INFOS) $(MANPAGES) Makefile $(HEADERS) $(SOURCES)
 LINT_CRON	=	cron.c database.c user.c entry.c compat.c \
 			misc.c job.c do_command.c env.c popen.c
 LINT_CRONTAB	=	crontab.c misc.c entry.c env.c compat.c
 CRON_OBJ	=	cron.o database.o user.o entry.o job.o do_command.o \
-			misc.o env.o popen.o compat.o
+			misc.o env.o popen.o compat.o libiphb/libiphb.o
 CRONTAB_OBJ	=	crontab.o misc.o entry.o env.o compat.o
 
 all		:	cron crontab
