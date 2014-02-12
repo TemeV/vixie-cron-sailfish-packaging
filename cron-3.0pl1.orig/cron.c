@@ -33,6 +33,7 @@ static char rcsid[] = "$Id: cron.c,v 2.11 1994/01/15 20:43:43 vixie Exp $";
 
 // zeamoceq - Sailfish 'sleep'
 #include "libiphb/libiphb.h"
+iphb_t g_iphbdHandler;
 
 static	void	usage __P((void)),
 		run_reboot_jobs __P((cron_db *)),
@@ -116,6 +117,8 @@ main(argc, argv)
 	load_database(&database);
 	run_reboot_jobs(&database);
 	cron_sync();
+    // zeamoceq - Sailfish libiphb
+    g_iphbdHandler = iphb_open(0);
 	while (TRUE) {
 # if DEBUGGING
 		if (!(DebugFlags & DTEST))
@@ -132,6 +135,8 @@ main(argc, argv)
 		 */
 		TargetTime += 60;
 	}
+    // zeamoceq - Sailfish libiphb
+    iphb_close(g_iphbdHandler);
 }
 
 
@@ -245,15 +250,13 @@ cron_sleep() {
         // use libiphb for sleeping
         // probably needs improvments
         {
-            iphb_t iphbdHandler;
             int sockfd;
             fd_set readfds;
             struct timeval timeout;
             time_t r;
 
-            iphbdHandler = iphb_open(0);
-            sockfd = iphb_get_fd(iphbdHandler);
-            r = iphb_wait(iphbdHandler, seconds_to_wait - (seconds_to_wait * .95), seconds_to_wait + (seconds_to_wait * .95), 0);
+            sockfd = iphb_get_fd(g_iphbdHandler);
+            r = iphb_wait(g_iphbdHandler, seconds_to_wait - (seconds_to_wait * .95), seconds_to_wait + (seconds_to_wait * .95), 0);
 
             FD_ZERO(&readfds);
             FD_SET(sockfd, &readfds);
