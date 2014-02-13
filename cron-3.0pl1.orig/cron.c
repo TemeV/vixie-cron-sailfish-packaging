@@ -256,19 +256,19 @@ cron_sleep() {
             time_t r;
 
             sockfd = iphb_get_fd(g_iphbdHandler);
-            r = iphb_wait(g_iphbdHandler, seconds_to_wait - (seconds_to_wait * .95), seconds_to_wait + (seconds_to_wait * .95), 0);
+            int delta = seconds_to_wait / 4;
+            r = iphb_wait(g_iphbdHandler, seconds_to_wait - delta, seconds_to_wait + delta, 0);
 
             FD_ZERO(&readfds);
             FD_SET(sockfd, &readfds);
 
             timeout.tv_sec = seconds_to_wait + 2;
             timeout.tv_usec = 0;
-
             select(sockfd + 1, &readfds, NULL, NULL, &timeout);
 
             seconds_to_wait = 0;
         }
-	}
+	}    
 }
 
 
