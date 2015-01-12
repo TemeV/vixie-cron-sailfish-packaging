@@ -113,7 +113,7 @@ crontab		:	$(CRONTAB_OBJ)
 			$(CC) $(LDFLAGS) -o crontab $(CRONTAB_OBJ) $(LIBS)
 
 install		:	all
-			$(INSTALL) -c -m  111 -o root -s cron    $(DESTSBIN)/
+			$(INSTALL) -c -m  111 -o root -s cron    $(DESTSBIN)/vixie_crond
 			$(INSTALL) -c -m 4111 -o root -s crontab $(DESTBIN)/
 			sh putman.sh crontab.1 $(DESTMAN)
 			sh putman.sh cron.8    $(DESTMAN)
