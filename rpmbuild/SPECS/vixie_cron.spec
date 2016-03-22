@@ -48,7 +48,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/crontab
 %defattr(644,root,root)
 /lib/systemd/system/cron.service
-%defattr(755,root,root)
+%defattr(644,root,root)
 /usr/share/man/man1/crontab.1.gz
 /usr/share/man/man8/cron.8.gz
 /usr/share/man/man5/crontab.5.gz
@@ -58,9 +58,11 @@ rm -rf $RPM_BUILD_ROOT
 %post
 systemctl enable cron.service
 systemctl start cron.service
+ln -s /bin/vi /usr/bin/vi
 
 %preun
 systemctl stop cron.service
 systemctl disable cron.service
 systemctl daemon-reload
+unlink /usr/bin/vi
 
